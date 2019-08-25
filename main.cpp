@@ -316,7 +316,7 @@ int main() {
     string result_multiplication;
     string result_division;
 
-    // testing lines for each independent method to debug / 各方法的bebug独立测试行
+    // testing lines for each independent method to debug / 各方法的debug独立测试行
 //    cout << "result_addition " << school_addition(num01, num02, base) << endl;
 //    cout << "result_minus: " << school_subtraction(num01, num02, base) << endl;
 //    cout << "result_schoolMultiply " << school_multiply(num01, num02, base) << endl;
