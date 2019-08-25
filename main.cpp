@@ -1,6 +1,14 @@
-//
-// Created by JaycoGAO on 2019-08-02.
-//
+
+// BigNumber four operations by base, length of BigNumber can be up to 100-digit;
+// addition, subtraction, multiplication(Karatsuba Algorithm), division;
+// input: string num01, string num02, int base;
+// output: bigNumber addition + Karatsuba multiplication + division;
+
+// Assignment 1 for Algorithm and Data Structure Analysis of University of Adelaide;
+// WARNING: DO NOT copy the document thoroughly or change the variables solely, plagiarism may occur;
+// WARNING: The "main.cpp" is validated within the accepted running time by University WebSubmission system;
+// Feel free to contact me by hello@jaycogao.com;
+
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -9,15 +17,15 @@
 
 using namespace std;
 
-// 减法结果为负，留给除法检测；
-// positive=1: 结果为负；
+// set static variable for "school_subtraction" as the indicator if "a-b < 0" / 全局变量indicator用于服务循环减法;
+// indicator = 1: a-b < 0 / 当indicator为1，说明 a-b < 0;
 static bool indicator = 0;
 
-// SchoolMethod_Addition
+// SchoolMethod_Addition / 教学式加法(按位累加，保留进位);
 string school_addition(string num01, string num02, int base) {
 
-    // ensure the biggest one is num01
-    // swap two numbers
+    // ensure the biggest one is num01 / 保证num01是最大值;
+    // swap two numbers / 否则交换num01和num02位置;
     if (num01.size() < num02.size()) {
         string tmp = num01;
         num01 = num02;
@@ -31,14 +39,14 @@ string school_addition(string num01, string num02, int base) {
     int sum_current = 0;
     int carry_current = 0;
 
-    // add(char addition) from LSB to MSB in string
+    // add(char addition) from LSB to MSB in string / 从字符串的最后一位往前加;
     while (num01_length > 0) {
         parta = num01[num01_length - 1] - '0';
-        // if num02 bits exist
+        // if num02 bits exist / 当num02还有位数;
         if (num02_length > 0) {
             partb = num02[num02_length - 1] - '0';
         } else {
-            // num02 no bit
+            // num02 no bit / 当num02没有位数;
             partb = 0;
         }
         sum_current = parta + partb + carry_current;
@@ -55,21 +63,19 @@ string school_addition(string num01, string num02, int base) {
     return num01;
 }
 
-// SchoolMethod_Minus
-string school_minus(string num01, string num02, int base) {
+// SchoolMethod_subtraction / 教学式减法;
+string school_subtraction(string num01, string num02, int base) {
 
     string result_minus;
     int num01_length = num01.length();
     int num02_length = num02.length();
     int gap_length = num01_length - num02_length;
     int carry = 0;
+    // unify the digits of num01 & num02 / 统一num01和num02的位数;
     if (gap_length < 0) {
-        // when num01 < num02, go on but the indicator will record it
         for (int i = 0; i < num02_length - num01_length; ++i) {
             num01 = "0" + num01;
         }
-        //num01 smaller than num02
-//        return 0;
     } else {
         while (gap_length > 0) {
             num02 = "0" + num02;
@@ -77,7 +83,7 @@ string school_minus(string num01, string num02, int base) {
         }
     }
 
-    // from LSB to MSB
+    // from LSB to MSB / 从num01 or num02的最后一位向前减;
     for (int i = num01.length() - 1; i >= 0; i--) {
         int parta = num01[i] - '0';
         int partb = num02[i] - '0';
@@ -96,14 +102,16 @@ string school_minus(string num01, string num02, int base) {
     for (unsigned int i = 0; i < result_minus.length() / 2; i++) {
         swap(result_minus[i], result_minus[result_minus.length() - i - 1]);
     }
-    // 如果num01 < num02, 这里预留以备除法检测；
+    // if num01 < num02, indicator will be set to 1 / 如果num01 < num02, indicator变成1, 预留以备除法检测；
+    // Default solution here is 100 - 200 => "1" + "100" - "200" => 1100 - 200 = 900, combine "school_division" to pick up;
+    // 默认这里将100-200按照100借一位也就是1100-200，结果为900，请结合"school_division"方法理解这里为何这么做；
     if (carry == -1) {
         indicator = 1;
     }
     return result_minus;
 }
 
-// school_Multiplication
+// school_Multiplication / 教学式乘法
 string school_multiply(string num01, string num02, int base) {
 
     string result_multiply = "";
@@ -114,9 +122,9 @@ string school_multiply(string num01, string num02, int base) {
     if (num01_length == 0 || num02_length == 0)
         return "0";
 
-    // from LSB to MSB into vector container
+    // from LSB to MSB into vector container / 将末位→第一位存入vector;
+    // identical solution with that in "school_subtraction" / 与"school_subtraction"方法一样的解决思维;
     vector<int> result(num01_length + num02_length, 0);
-    // from LSB to MSB of num01
     for (int i = num01_length - 1; i >= 0; i--) {
         int carry = 0;
         int num01_current = num01[i] - '0';
@@ -144,7 +152,8 @@ string school_multiply(string num01, string num02, int base) {
     return result_multiply;
 }
 
-// delete leading 0 for division
+// delete leading 0 for division / 删除结果开头无意义的'0';
+// "00123456" => "123456";
 string delete_leading_zero(string input) {
 
     string result;
@@ -162,14 +171,15 @@ string delete_leading_zero(string input) {
     return result;
 }
 
-// Karatsuba Multiplication
+// Karatsuba BigNumber Multiplication / Karatsuba 大数乘法
+// logic induction provided by Wikipeadia / 算法逻辑推理请参考维基百科 => https://en.wikipedia.org/wiki/Karatsuba_algorithm
 string karatsuba(string num01, string num02, int base) {
 
     if (num01.length() == 1 || num02.length() == 1) {
         int parta;
         int partb;
 
-//      from string to int
+//      from string to int / C++ 中使用 #include <sstream> 将string转为int;
         std::istringstream tmp01(num01);
         tmp01 >> parta;
 
@@ -188,6 +198,7 @@ string karatsuba(string num01, string num02, int base) {
         return sum_current;
     }
 
+    // when digits not same, unify them / 当位数不一致，补齐位数;
     if (num01.length() < num02.length()) {
         for (unsigned int i = 0; i < num02.length() - num01.length(); i++) {
             num01.insert(0, "0");
@@ -207,7 +218,7 @@ string karatsuba(string num01, string num02, int base) {
     string c = num02.substr(0, num02.length() - middle);
     string d = num02.substr(num02.length() - middle, num02.size());
 
-    // when bits <= 3, algorithm optimization
+    // when bits <= 3, algorithm optimization(by math induction) / 当只有三位(数学归纳法推理得出)，可直接使用学校乘法优化算法;
     if (num01.length() <= 3) {
         string tmp01 = school_multiply(a, c, base);
         string tmp02 = school_multiply(b, d, base);
@@ -227,7 +238,7 @@ string karatsuba(string num01, string num02, int base) {
         string ac_based = school_multiply(a, c, base);
         string bd_based = school_multiply(b, d, base);
         string ab_cd_based = school_multiply(school_addition(a, b, base), school_addition(c, d, base), base);
-        ab_cd_based = school_minus(ab_cd_based, school_addition(ac_based, bd_based, base), base);
+        ab_cd_based = school_subtraction(ab_cd_based, school_addition(ac_based, bd_based, base), base);
         int i = 0;
         while (i < middle * 2) {
             ac_based += '0';
@@ -239,33 +250,32 @@ string karatsuba(string num01, string num02, int base) {
             j++;
         }
         string tmp = school_addition(ac_based, school_addition(ab_cd_based, bd_based, base), base);
+        // delete the leading zero / 删除结果的开头无意义的0;
+        // Example: "00123456" => "123456";
         return delete_leading_zero(tmp);
     }
 }
 
-// 基于加法的除法：a - b*n;
+// school_division for smallNumber based on "school_subtraction" / 基于教学式减法的教学式除法;
+// only prepare for "division", not used this method solely to carry out bigNumber division(running exceed)
+// 该方法预留给"division"大数除法用，不作为大数除法的直接方法使用(running exceed);
 int school_division(string num01, string num02, int base) {
+    // reset the indicator / 重置 indicator;
     indicator = 0;
     int result_division = 0;
-    // num01-num02初次减法结果默认为正
-    string tmp = school_minus(num01, num02, base);
+    // this tmp set to be positive / num01-num02初次减法结果默认为正;
+    string tmp = school_subtraction(num01, num02, base);
     result_division++;
-    // 当indicator=1说明减法结果为负，否则为正；
+    // when indicator =0 means the last subtraction loop is negative => a<b, end up "result_division" counting;
+    // 当indicator=1说明最后一次循环减法结果为负，result_division可以终止计数;
     while (indicator != 1) {
-        tmp = school_minus(tmp, num02, base);
+        tmp = school_subtraction(tmp, num02, base);
         result_division++;
-        // 减法过程测试:
-//        cout << "result_division: " << result_division << endl;
-//        cout << "num01: " << num01 << endl;
-//        cout << "num02: " << num02 << endl;
-//        cout << "tmp: " << tmp << endl;
-//        cout << "---" << endl;
     }
     return result_division - 1;
 }
 
-
-// Division for big integer
+// Division for big integer / 大数除法
 string division(string num01, string num02, int base) {
 
     string result = "";
@@ -281,21 +291,14 @@ string division(string num01, string num02, int base) {
 
     string result_first = to_string(school_division(num01_left, num02, base));
     result += result_first;
-    module = school_minus(num01_left, school_multiply(num02, result_first, base), base);
-
-//    cout << "result_first: " << result_first << endl;
-//    cout << "result: " << result << endl;
-//    cout << "module: " << module << endl;
+    module = school_subtraction(num01_left, school_multiply(num02, result_first, base), base);
 
     while (i < num01_right.size()) {
         num01_left = module + num01_right[i];
         string result_current = to_string(school_division(num01_left, num02, base));
         result += result_current;
-        module = school_minus(num01_left, school_multiply(num02, result_current, base), base);
+        module = school_subtraction(num01_left, school_multiply(num02, result_current, base), base);
         i++;
-//        cout << "result_current: " << "\t" << result_current << endl;
-//        cout << "module: " << "\t" << module << endl;
-//        cout << "num01_right[i]: " << "\t" << num01_right[i] << endl;
     }
     return delete_leading_zero(result);
 }
@@ -313,14 +316,15 @@ int main() {
     string result_multiplication;
     string result_division;
 
+    // testing lines for each independent method to debug / 各方法的bebug独立测试行
 //    cout << "result_addition " << school_addition(num01, num02, base) << endl;
-//    cout << "result_minus: " << school_minus(num01, num02, base) << endl;
+//    cout << "result_minus: " << school_subtraction(num01, num02, base) << endl;
 //    cout << "result_schoolMultiply " << school_multiply(num01, num02, base) << endl;
 //    cout << "result_multiplication " << karatsuba(num01, num02, base) << endl;
 //    cout << "result_division: " << school_division(num01, num02, base) << endl;
 //    cout << "result_division: " << division(num01, num02, base) << endl;
 
-//     加法 + 乘法 + 除法结果导出
+//    bigNumber addition + Karatsuba multiplication + division / 加法 + 乘法 + 除法结果统一导出
     cout << school_addition(num01, num02, base) << "\t" << karatsuba(num01, num02, base) << "\t"
          << division(num01, num02, base);
     return 0;
