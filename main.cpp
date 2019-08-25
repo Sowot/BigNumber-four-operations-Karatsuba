@@ -1,3 +1,4 @@
+
 // BigNumber four operations by base, length of BigNumber can be up to 100-digit;
 // addition, subtraction, multiplication(Karatsuba Algorithm), division;
 // input: string num01, string num02, int base;
@@ -5,7 +6,7 @@
 
 // Assignment 1 for Algorithm and Data Structure Analysis of University of Adelaide;
 // WARNING: DO NOT copy the document thoroughly or change the variables solely, plagiarism may occur;
-// WARNING: The "main.cpp" is validated within the accepted running time by University WebSubmission system;
+// TIPS: The "main.cpp" is validated within the accepted running time by University WebSubmission system;
 // Feel free to contact me by hello@jaycogao.com;
 
 #include <iostream>
@@ -50,6 +51,7 @@ string school_addition(string num01, string num02, int base) {
         }
         sum_current = parta + partb + carry_current;
         num01[num01_length - 1] = '0' + sum_current % base;
+//        cout << "num01[num01_length]: " << "\t" << num01[num01_length]<< endl;
         carry_current = sum_current / base;
         num01_length--;
         num02_length--;
@@ -94,7 +96,8 @@ string school_subtraction(string num01, string num02, int base) {
             carry = 0;
         }
         // number into string
-        result_minus += to_string(minus_current);
+        string tmp = to_string(minus_current);
+        result_minus += tmp;
     }
     // reverse to be the result
     for (unsigned int i = 0; i < result_minus.length() / 2; i++) {
@@ -107,6 +110,25 @@ string school_subtraction(string num01, string num02, int base) {
         indicator = 1;
     }
     return result_minus;
+}
+
+// delete leading 0 for division / 删除结果开头无意义的'0';
+// "00123456" => "123456";
+string delete_leading_zero(string input) {
+
+    string result;
+    int index = 0;
+    int count = 0;
+    int tmp_length = input.size();
+    while (index < tmp_length) {
+        if (input.at(index) == '0') {
+            count++;
+        } else
+            break;
+        index++;
+    }
+    result = input.substr(count, input.size());
+    return result;
 }
 
 // school_Multiplication / 教学式乘法
@@ -136,37 +158,16 @@ string school_multiply(string num01, string num02, int base) {
             num02_index++;
             j--;
         }
-        if (carry > 0)
+        if (carry >= 0)
             result[num01_index + num02_index] += carry;
         num01_index++;
     }
     int i = result.size() - 1;
-    while (i >= 0 && result[i] == 0)
-        i--;
-    if (i == -1)
+    if (i < 0)
         return "0";
     while (i >= 0)
         result_multiply += to_string(result[i--]);
-    return result_multiply;
-}
-
-// delete leading 0 for division / 删除结果开头无意义的'0';
-// "00123456" => "123456";
-string delete_leading_zero(string input) {
-
-    string result;
-    int index = 0;
-    int count = 0;
-    int tmp_length = input.size();
-    while (index < tmp_length) {
-        if (input.at(index) == '0') {
-            count++;
-        } else
-            break;
-        index++;
-    }
-    result = input.substr(count, input.size());
-    return result;
+    return delete_leading_zero(result_multiply);
 }
 
 // Karatsuba BigNumber Multiplication / Karatsuba 大数乘法
