@@ -50,7 +50,6 @@ string school_addition(string num01, string num02, int base) {
         }
         sum_current = parta + partb + carry_current;
         num01[num01_length - 1] = '0' + sum_current % base;
-//        cout << "num01[num01_length]: " << "\t" << num01[num01_length]<< endl;
         carry_current = sum_current / base;
         num01_length--;
         num02_length--;
