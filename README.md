@@ -1,6 +1,7 @@
 # BigNumber-fourOperations-use-string-C++
 Algorithm and Data Structure Analysis_Assignment 1_University of Adelaide  
-//BigNumber four operations by base, length of BigNumber can be up to 100-digit;  
+  
+// BigNumber four operations by base, length of BigNumber can be up to 100-digit;  
 // addition, subtraction, multiplication(Karatsuba Algorithm), division;  
 // input: string num01, string num02, int base;  
 // output: bigNumber addition + Karatsuba multiplication + division;  
